@@ -31,40 +31,98 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 
 
-__all__=["Phaser", "reroute_power", "PhaserNotLockedOnTarget",
+__all__=["Beam", "Phaser", "reroute_power", "PhaserNotLockedOnTarget",
                "Shields","WarpEngine", "AuthorizationRequired",
-               "WrongAuthorization"
+               "WrongAuthorization", "TractorBeam",
                 ]
 
 import exceptions
-class PhaserNotLockedOnTarget (exceptions.BaseException):
+class BeamNotLockedOnTarget (exceptions.BaseException):
+    def __init__(self, obj):
+        self.beam = obj
+    
+    def __str__(self):
+        return "%s not locked on target!" % (self.beam,)
+
+
+class TractorBeamStillActive(exceptions.BaseException):
     pass
+
 
 class AuthorizationRequired (exceptions.BaseException):
     pass
+
 
 class WrongAuthorization(exceptions.BaseException):
     pass
 
 
+class Beam(object):
+    def __init__(self):
+        raise NotImplementedException("abstract base class")
+    
+    def lock_target(self, what):
+        """makes where the target of any beam""" 
+        self.what=what
+        print self
+    
+    def unlock_target(self):
+        """frees the beam again"""
+        if self.locked:
+            del self.what
+    
+    @property
+    def locked(self):
+        return getattr(self,"what",None) is not None
 
-class Phaser(object):
+
+class Phaser(Beam):
     def __init__(self):
         """creates a new Phaser control object"""
         print "Phaser initiated"
     
-    def lock_target(self, what):
-        """makes where the target of phaser""" 
-        self.what=what
-        print "phaser locked on %s" % (what,)
-    
     def fire(self):
-        what=getattr(self,"what",None)
-        if what:
-            print "phaser fired on %s" % (what,)
+        if self.locked:
+            print "phaser fired on %s" % (self.what,)
         else:
-            raise PhaserNotLockedOnTarget
-            
+            raise BeamNotLockedOnTarget(self)
+    
+    def __repr__(self):
+        if self.locked:
+            return "Phaser locked on %s" % (self.what,)
+        else:
+            return "Phaser"
+
+
+class TractorBeam(Beam):
+    def __init__(self):
+        """creates a new tractor beam control object"""
+        print "Tractor beam initiated"
+    
+    def activate(self):
+        if self.locked:
+            self.active = True
+            print "%s captured by tractor beam" % (self.what,)
+        else:
+            raise BeamNotLockedOnTarget(self)
+    
+    def unlock_target(self):
+        if getattr(self,"active",False):
+            raise TractorBeamStillActive
+        else:
+            super(TractorBeam, self).unlock_target()
+    
+    def release(self):
+        if self.locked and getattr(self,"active",False):
+            del self.active
+            print "%s released" % (self.what,)
+    
+    def __repr__(self):
+        if self.locked:
+            return "Tractor beam locked on %s" % (self.what,)
+        else:
+            return "Tractor beam"
+
 
 def reroute_power(from_what, to_what):
     """reroutes power from from_what to to_what"""
@@ -83,7 +141,8 @@ class WarpEngine(object):
     
     def __repr__(self):
         return "WarpEngine %s " % (id(self),)
-        
+
+
 class ImpulseEngine(object):
     def activate(self):
         """activates the impulse engine."""
@@ -113,7 +172,7 @@ class Hull(object):
         
     def __repr__(self):
         return "Hull %s " % (id(self),)
-
+    
 
 if __name__=='__main__':
     pass
