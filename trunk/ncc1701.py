@@ -84,11 +84,35 @@ class WarpEngine(object):
     def __repr__(self):
         return "WarpEngine %s " % (id(self),)
         
+class ImpulseEngine(object):
+    def activate(self):
+        """activates the impulse engine."""
+        print "impulse engine activated."    
+  
+    def __repr__(self):
+        return "WarpEngine %s " % (id(self),)
+  
 
 class Shields(object):
     def __repr__(self):
         return "Shields %s " % (id(self),)
     
+
+class Hull(object):
+    def emergency_separation(self, authorization=None):
+        """separates the primary (aka. saucer) and secondary hulls in case of an emergency."""
+        if authorization is None:
+            raise AuthorizationRequired
+        elif authorization == "Kirk":
+            print "separating saucer section, please prepare for leaving secondary hull!"
+        else:
+            raise WrongAuthorization
+        
+        impulseEngine = ImpulseEngine()
+        impulseEngine.activate()
+        
+    def __repr__(self):
+        return "Hull %s " % (id(self),)
 
 
 if __name__=='__main__':
