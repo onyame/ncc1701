@@ -90,7 +90,7 @@ class ImpulseEngine(object):
         print "impulse engine activated."    
   
     def __repr__(self):
-        return "WarpEngine %s " % (id(self),)
+        return "ImpulseEngine %s " % (id(self),)
   
 
 class Shields(object):
