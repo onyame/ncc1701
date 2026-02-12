@@ -31,13 +31,20 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 
 
-__all__=["Beam", "Phaser", "reroute_power", "PhaserNotLockedOnTarget",
-               "Shields","WarpEngine", "AuthorizationRequired",
-               "WrongAuthorization", "TractorBeam",
-                ]
+__all__ = [
+    "Beam",
+    "Phaser",
+    "reroute_power",
+    "PhaserNotLockedOnTarget",
+    "Shields",
+    "WarpEngine",
+    "AuthorizationRequired",
+    "WrongAuthorization",
+    "TractorBeam",
+]
 
-import exceptions
-class BeamNotLockedOnTarget (exceptions.BaseException):
+
+class BeamNotLockedOnTarget(Exception):
     def __init__(self, obj):
         self.beam = obj
     
@@ -45,26 +52,29 @@ class BeamNotLockedOnTarget (exceptions.BaseException):
         return "%s not locked on target!" % (self.beam,)
 
 
-class TractorBeamStillActive(exceptions.BaseException):
+PhaserNotLockedOnTarget = BeamNotLockedOnTarget
+
+
+class TractorBeamStillActive(Exception):
     pass
 
 
-class AuthorizationRequired (exceptions.BaseException):
+class AuthorizationRequired(Exception):
     pass
 
 
-class WrongAuthorization(exceptions.BaseException):
+class WrongAuthorization(Exception):
     pass
 
 
 class Beam(object):
     def __init__(self):
-        raise NotImplementedException("abstract base class")
+        raise NotImplementedError("abstract base class")
     
     def lock_target(self, what):
         """makes where the target of any beam""" 
         self.what=what
-        print self
+        print(self)
     
     def unlock_target(self):
         """frees the beam again"""
@@ -79,11 +89,11 @@ class Beam(object):
 class Phaser(Beam):
     def __init__(self):
         """creates a new Phaser control object"""
-        print "Phaser initiated"
+        print("Phaser initiated")
     
     def fire(self):
         if self.locked:
-            print "phaser fired on %s" % (self.what,)
+            print("phaser fired on %s" % (self.what,))
         else:
             raise BeamNotLockedOnTarget(self)
     
@@ -97,12 +107,12 @@ class Phaser(Beam):
 class TractorBeam(Beam):
     def __init__(self):
         """creates a new tractor beam control object"""
-        print "Tractor beam initiated"
+        print("Tractor beam initiated")
     
     def activate(self):
         if self.locked:
             self.active = True
-            print "%s captured by tractor beam" % (self.what,)
+            print("%s captured by tractor beam" % (self.what,))
         else:
             raise BeamNotLockedOnTarget(self)
     
@@ -115,7 +125,7 @@ class TractorBeam(Beam):
     def release(self):
         if self.locked and getattr(self,"active",False):
             del self.active
-            print "%s released" % (self.what,)
+            print("%s released" % (self.what,))
     
     def __repr__(self):
         if self.locked:
@@ -126,7 +136,7 @@ class TractorBeam(Beam):
 
 def reroute_power(from_what, to_what):
     """reroutes power from from_what to to_what"""
-    print "rerouting power from %s to %s" % (from_what, to_what)
+    print("rerouting power from %s to %s" % (from_what, to_what))
     
     
 class WarpEngine(object):
@@ -135,7 +145,7 @@ class WarpEngine(object):
         if authorization is None:
             raise AuthorizationRequired
         elif authorization == "Kirk":
-            print "ejecting Warp core, prepare to abandon ship"
+            print("ejecting Warp core, prepare to abandon ship")
         else:
             raise WrongAuthorization
     
@@ -146,7 +156,7 @@ class WarpEngine(object):
 class ImpulseEngine(object):
     def activate(self):
         """activates the impulse engine."""
-        print "impulse engine activated."    
+        print("impulse engine activated.")
   
     def __repr__(self):
         return "ImpulseEngine %s " % (id(self),)
@@ -163,7 +173,9 @@ class Hull(object):
         if authorization is None:
             raise AuthorizationRequired
         elif authorization == "Kirk":
-            print "separating saucer section, please prepare for leaving secondary hull!"
+            print(
+                "separating saucer section, please prepare for leaving secondary hull!"
+            )
         else:
             raise WrongAuthorization
         
